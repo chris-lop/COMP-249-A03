@@ -8,9 +8,55 @@ import java.io.File;
 public class CSV2HTML {
 
     public static void ConvertCSVtoHTML(Scanner sc, PrintWriter pw) throws CSVAttributeMissing, CSVDataMissing {
+        // Save title line
+        sc.skip("ï»¿");
+        String title = sc.nextLine();
 
+        // Print title
+        System.out.println(title);
 
+        // Save attributes
+        String attributes = sc.nextLine();
+        String[] attributeList = attributes.split(",");
+
+        // Check for misisng attributes and throw exception if missing
+        for (int i = 0; i < attributeList.length ; i++) {
+            if (attributeList[i] == "")
+                throw new CSVAttributeMissing();
+        }
+
+        // Print attributes
+        for (int i = 0; i < attributeList.length ; i++) {
+            System.out.println(attributeList[i]);
+        }
         
+        // While loop that handles saving and printing of data and note lines
+        String note;
+
+        while(sc.hasNextLine()) {
+            // Save Note (in savedata)
+            if (sc.hasNextLine() == false) {
+                note = sc.nextLine();
+
+                // Write note
+                System.out.println(note);
+            }
+                
+
+            // Saving and Printing Data
+            String data = sc.nextLine();
+            String[] dataList = data.split(",");
+
+            // Check for missing data and throw exception if missing
+            for (int i = 0; i < dataList.length ; i++) {
+                if (dataList[i] == "")
+                    throw new CSVDataMissing();
+            }
+            // Write data
+            for (int i = 0; i < dataList.length ; i++) {
+                System.out.println(dataList[i]);
+            }
+        }
     }
     
     // function to delete subdirectories and files
@@ -32,6 +78,7 @@ public class CSV2HTML {
         Scanner sc = null;
         PrintWriter pw = null;
         Scanner keyboard = new Scanner(System.in);
+        int fileCounter=1;
 
         // Welcome Message
         System.out.println("=======================================");
@@ -45,7 +92,7 @@ public class CSV2HTML {
         keyboard.nextLine();
 
         // Create output file directory
-        String filepath = "C:\\A03Output";
+        String filepath = "C:/A03Output/";
         File outputFolder = new File(filepath);
 
         // For loop to repeat file creation for every file
@@ -53,7 +100,7 @@ public class CSV2HTML {
         for (int i = 0; i < fileNb; i++) {
 
         // Ask for file names
-        int fileCounter=1;
+        
         System.out.println("Please enter the name of file #"+Integer.toString(fileCounter));
         System.out.println("Do NOT include the file extension!");
         String filename = keyboard.nextLine();
@@ -61,7 +108,7 @@ public class CSV2HTML {
 
         // Opening Input files
         try {
-            sc = new Scanner(new FileInputStream(filename+".csv"));
+            sc = new Scanner(new FileInputStream("C:/A03Input/"+filename+".csv"));
          } catch (FileNotFoundException e) {
              System.err.println("Could not open file "+filename+" for reading.");
              System.err.println("Please check that the file exists and is readable. This program will terminate after closing any opened files.");
@@ -71,7 +118,7 @@ public class CSV2HTML {
 
          // Opening Output files
         try {
-            pw = new PrintWriter(new FileOutputStream("C:\\A03Output\\"+filename+".html"));
+            pw = new PrintWriter(new FileOutputStream("C:/A03Output/"+filename+".html"));
          } catch (FileNotFoundException e) {
              System.err.println("Could not open file "+filename+" for reading.");
              System.err.println("Please check that the file exists and is readable. This program will terminate after closing any opened files.");
@@ -84,10 +131,13 @@ public class CSV2HTML {
             // Requirement 4 - Calls ConvertCSVtoHTML method
             try {
                 ConvertCSVtoHTML(sc, pw);
+                pw.close();
             } catch (CSVAttributeMissing e) {
                 //TODO: handle exception
+                System.err.println("ERROR: In file "+filename+".csv. Missing attribute. File is not converted to HTML.");
             } catch (CSVDataMissing e) {
                 //TODO: handle exception
+                System.err.println("CSV DATA MISSING");
             }
         }
         
