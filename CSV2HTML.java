@@ -7,7 +7,7 @@ import java.io.File;
 
 public class CSV2HTML {
 
-    public static void ConvertCSVtoHTML(Scanner sc, PrintWriter pw) throws CSVAttributeMissing, CSVDataMissing {
+    public static void ConvertCSVtoHTML(Scanner sc, PrintWriter pw, String file) throws CSVAttributeMissing {
         // Save title line
         sc.skip("ï»¿");
         String title = sc.nextLine();
@@ -32,6 +32,7 @@ public class CSV2HTML {
         
         // While loop that handles saving and printing of data and note lines
         String note;
+        int line = 3, missingIndex = 0;
 
         while(sc.hasNextLine()) {
             // Save Note (in savedata)
@@ -41,21 +42,29 @@ public class CSV2HTML {
                 // Write note
                 System.out.println(note);
             }
-                
-
+             
             // Saving and Printing Data
-            String data = sc.nextLine();
-            String[] dataList = data.split(",");
+            try {
+                // Saving Data
+                String data = sc.nextLine();
+                String[] dataList = data.split(",");
 
-            // Check for missing data and throw exception if missing
-            for (int i = 0; i < dataList.length ; i++) {
-                if (dataList[i] == "")
-                    throw new CSVDataMissing();
+                // Check for missing data and throw exception if missing
+                for (int i = 0; i < dataList.length ; i++) {
+                    if (dataList[i] == "") {
+                        missingIndex = i;
+                        throw new CSVDataMissing();
+                    }
+                }
+                // Write data
+                for (int i = 0; i < dataList.length ; i++) {
+                    System.out.println(dataList[i]);
+                }
+            } catch (CSVDataMissing e) {
+                //TODO: handle exception
+                System.err.println("WARNING: In file "+file+".csv line "+Integer.toString(line)+" is not converted to HTML: missing data: "+attributeList[missingIndex]);
             }
-            // Write data
-            for (int i = 0; i < dataList.length ; i++) {
-                System.out.println(dataList[i]);
-            }
+            line++;
         }
     }
     
@@ -130,14 +139,11 @@ public class CSV2HTML {
 
             // Requirement 4 - Calls ConvertCSVtoHTML method
             try {
-                ConvertCSVtoHTML(sc, pw);
+                ConvertCSVtoHTML(sc, pw, filename);
                 pw.close();
             } catch (CSVAttributeMissing e) {
                 //TODO: handle exception
                 System.err.println("ERROR: In file "+filename+".csv. Missing attribute. File is not converted to HTML.");
-            } catch (CSVDataMissing e) {
-                //TODO: handle exception
-                System.err.println("CSV DATA MISSING");
             }
         }
         
