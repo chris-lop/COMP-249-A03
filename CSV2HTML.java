@@ -8,12 +8,26 @@ import java.io.File;
 public class CSV2HTML {
 
     public static void ConvertCSVtoHTML(Scanner sc, PrintWriter pw, String file) throws CSVAttributeMissing {
+        // Printing HTML page Head Section
+        pw.println("<html>");
+        pw.println("<style>");
+        pw.print("table {font-family: arial, sans-serif;border-collapse: collapse;}");
+        pw.print("td, th {border: 1px solid #000000;text-align: left;padding: 8px;}");
+        pw.print("tr:nth-child(even) {background-color: #dddddd;}");
+        pw.print("span{font-size: small}");
+        pw.println("</style>");
+        
+        pw.println("<body>");
+
+        pw.println("<table>");
+        
         // Save title line
         sc.skip("ï»¿");
         String title = sc.nextLine();
+        String[] titleList = title.split(",");
 
         // Print title
-        System.out.println(title);
+        pw.println("<caption>"+titleList[0]+"</caption>");
 
         // Save attributes
         String attributes = sc.nextLine();
@@ -24,11 +38,15 @@ public class CSV2HTML {
             if (attributeList[i] == "")
                 throw new CSVAttributeMissing();
         }
+        
+        pw.println("<tr>");
 
         // Print attributes
         for (int i = 0; i < attributeList.length ; i++) {
-            System.out.println(attributeList[i]);
+            pw.println("<td>"+attributeList[i]+"</td>");
         }
+
+        pw.println("</tr>");
         
         // While loop that handles saving and printing of data and note lines
         String note;
@@ -36,18 +54,18 @@ public class CSV2HTML {
 
         while(sc.hasNextLine()) {
             // Save Note (in savedata)
-            if (sc.hasNextLine() == false) {
-                note = sc.nextLine();
-
-                // Write note
-                System.out.println(note);
-            }
-             
             // Saving and Printing Data
             try {
                 // Saving Data
                 String data = sc.nextLine();
                 String[] dataList = data.split(",");
+
+                if (sc.hasNextLine() == false) {
+                    // Write note
+                    pw.println("</table>");
+                    pw.println("<span>"+dataList[0]+"</span>");
+                    break;
+                }
 
                 // Check for missing data and throw exception if missing
                 for (int i = 0; i < dataList.length ; i++) {
@@ -56,16 +74,24 @@ public class CSV2HTML {
                         throw new CSVDataMissing();
                     }
                 }
+
+                pw.println("<tr>");
+
                 // Write data
                 for (int i = 0; i < dataList.length ; i++) {
-                    System.out.println(dataList[i]);
+                    pw.println("<td>"+dataList[i]+"</td>");
                 }
+
+                pw.println("</tr>");
+
             } catch (CSVDataMissing e) {
                 //TODO: handle exception
                 appendToLogs("WARNING: In file "+file+".csv line "+Integer.toString(line)+" is not converted to HTML: missing data: "+attributeList[missingIndex]);
             }
             line++;
         }
+        pw.println("</body>");
+        pw.println("</html>");
     }
     
     // function to delete subdirectories and files
