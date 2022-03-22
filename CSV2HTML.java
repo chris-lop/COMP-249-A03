@@ -62,7 +62,7 @@ public class CSV2HTML {
                 }
             } catch (CSVDataMissing e) {
                 //TODO: handle exception
-                System.err.println("WARNING: In file "+file+".csv line "+Integer.toString(line)+" is not converted to HTML: missing data: "+attributeList[missingIndex]);
+                appendToLogs("WARNING: In file "+file+".csv line "+Integer.toString(line)+" is not converted to HTML: missing data: "+attributeList[missingIndex]);
             }
             line++;
         }
@@ -81,6 +81,20 @@ public class CSV2HTML {
             // delete files and empty subfolders
             subfile.delete();
         }
+    }
+
+    public static void appendToLogs(String aString) {
+        // Opening Exceptions file
+        PrintWriter logs = null;
+
+        try {
+            logs = new PrintWriter(new FileOutputStream("C:/A03Output/Exeptions.log"), true);
+            logs.println(aString);
+         } catch (FileNotFoundException e) {
+             System.err.println("Could not open Exceptions file for logging.");
+             System.err.println("This program will now terminate ...");
+             System.exit(0);
+            }
     }
 
     public static void main(String args[]) {
@@ -104,6 +118,9 @@ public class CSV2HTML {
         String filepath = "C:/A03Output/";
         File outputFolder = new File(filepath);
 
+        // Clear output directory from previous operations
+        deleteDirectory(outputFolder);
+
         // For loop to repeat file creation for every file
 
         for (int i = 0; i < fileNb; i++) {
@@ -119,8 +136,8 @@ public class CSV2HTML {
         try {
             sc = new Scanner(new FileInputStream("C:/A03Input/"+filename+".csv"));
          } catch (FileNotFoundException e) {
-             System.err.println("Could not open file "+filename+" for reading.");
-             System.err.println("Please check that the file exists and is readable. This program will terminate after closing any opened files.");
+             appendToLogs("Could not open file "+filename+" for reading.");
+             appendToLogs("Please check that the file exists and is readable. This program will terminate after closing any opened files.");
              sc.close();
              System.exit(0);
          }
@@ -129,9 +146,8 @@ public class CSV2HTML {
         try {
             pw = new PrintWriter(new FileOutputStream("C:/A03Output/"+filename+".html"));
          } catch (FileNotFoundException e) {
-             System.err.println("Could not open file "+filename+" for reading.");
-             System.err.println("Please check that the file exists and is readable. This program will terminate after closing any opened files.");
-             pw.close();
+             appendToLogs("Could not open file "+filename+" for reading.");
+             appendToLogs("Please check that the file exists and is readable. This program will terminate after closing any opened files.");
              deleteDirectory(outputFolder);
              sc.close();
              System.exit(0);
@@ -143,10 +159,9 @@ public class CSV2HTML {
                 pw.close();
             } catch (CSVAttributeMissing e) {
                 //TODO: handle exception
-                System.err.println("ERROR: In file "+filename+".csv. Missing attribute. File is not converted to HTML.");
+                appendToLogs("ERROR: In file "+filename+".csv. Missing attribute. File is not converted to HTML.");
             }
         }
-        
         // Requirement 5 - Display the HTML files in output directory
     }
 }
