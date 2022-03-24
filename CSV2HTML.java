@@ -3,7 +3,10 @@ import java.io.PrintWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 public class CSV2HTML {
 
@@ -11,10 +14,10 @@ public class CSV2HTML {
         // Printing HTML page Head Section
         pw.println("<html>");
         pw.println("<style>");
-        pw.print("table {font-family: arial, sans-serif;border-collapse: collapse;}");
-        pw.print("td, th {border: 1px solid #000000;text-align: left;padding: 8px;}");
-        pw.print("tr:nth-child(even) {background-color: #dddddd;}");
-        pw.print("span{font-size: small}");
+        pw.println("table {font-family: arial, sans-serif;border-collapse: collapse;}");
+        pw.println("td, th {border: 1px solid #000000;text-align: left;padding: 8px;}");
+        pw.println("tr:nth-child(even) {background-color: #dddddd;}");
+        pw.println("span{font-size: small}");
         pw.println("</style>");
         
         pw.println("<body>");
@@ -189,5 +192,50 @@ public class CSV2HTML {
             }
         }
         // Requirement 5 - Display the HTML files in output directory
+        System.out.println();
+        System.out.println("Please enter the name of the file you wish to open");
+        String lastfilename = keyboard.next();
+        keyboard.nextLine();
+
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader("C:/A03Output/"+lastfilename+".html"));
+
+            String brline = br.readLine();
+            while (brline != null) {
+                System.out.println(brline);
+                brline = br.readLine();
+            }
+            br.close();
+
+        } catch (FileNotFoundException e) {
+            try {
+                System.out.println("Error! That file name is invalid, please try again.");
+                lastfilename = keyboard.next();
+                keyboard.nextLine();
+
+                br = new BufferedReader(new FileReader("C:/A03Output/"+lastfilename+".html"));
+
+                String brline = br.readLine();
+                while (brline != null) {
+                    System.out.println(brline);
+                    brline = br.readLine();
+                }
+                br.close();
+
+            } catch (FileNotFoundException f) {
+                System.out.println("Error! That file name is also invalid.");
+                System.out.println("Program will terminate.");
+                System.exit(0);
+            } catch (IOException g) {
+                System.out.println("Error: An error has occured while reading from this file.");
+                System.out.println("Program will terminate.");
+                System.exit(0);
+            }
+        } catch (IOException e) {
+            System.out.println("Error: An error has occured while reading from this file.");
+            System.out.println("Program will terminate.");
+            System.exit(0);
+        }
     }
 }
